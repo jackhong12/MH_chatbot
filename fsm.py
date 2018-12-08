@@ -18,7 +18,7 @@ class TocMachine(GraphMachine):
                 'help',
                 'command',
                 'allMonster',
-                'moster'
+                'monster'
             ],
             'transitions': [
                 {
@@ -59,8 +59,28 @@ class TocMachine(GraphMachine):
         self.machine.add_transition('advance', 'user', 'help', conditions = 'isHelp')
         self.machine.add_transition('advance', 'user', 'command', conditions = 'isCommand')
         self.machine.add_transition('advance', 'user', 'allMonster', conditions = 'isAllMonster')
-        self.machine.add_transition('advance', 'allMonster', 'monster')
+        self.machine.add_transition('advance', 'allMonster', 'monster', conditions = 'isMonster')
+        self.machine.add_transition('advance', 'monster', 'allMonster', conditions = 'isBack')
+        self.machine.add_transition('back', 'monster', 'allMonster')
         #
+    
+    def isMonster(self, event):
+        sender_id = event['sender']['id']
+        text = event['message']['text']
+        if self.mhc.searchMonster(text): 
+            print(self.mhc.monImg)
+            responese = send_image_message(sender_id, self.mhc.monImg)
+            responese = send_text_message(sender_id, self.mhc.monster.get(1))
+            #print(self.mhc.monster.get(1))
+            return True
+        else:
+            responese = send_text_message(sender_id, "請輸入正確魔物名子")
+            return False
+
+
+    def on_enter_monster(self, event):
+        sender_id = event['sender']['id']
+    
     def isAllMonster(self, event):
         if event.get("message"):
             text = event['message']['text']
