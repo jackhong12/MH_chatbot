@@ -24,20 +24,18 @@ def setup_webhook():
 @route("/webhook", method="POST")
 def webhook_handler():
     body = request.json
-    print('\nFSM STATE: ' + machine.state)
-    print('REQUEST BODY: ')
+    print("\n\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    print('\n----------------------------------------------\nFSM STATE: ' + machine.state)
+    print('----------------------------------------------\nREQUEST BODY: ')
     print(body)
-
+    print("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    
     if body['object'] == "page":
         event = body['entry'][0]['messaging'][0]
         machine.advance(event)
         return 'OK'
 
-@route("/webhook", method="POSTBACK")
-def webhook_payload():
-    print('hello')
-
-
+        
 @route('/show-fsm', methods=['GET'])
 def show_fsm():
     machine.get_graph().draw('fsm.png', prog='dot', format='png')

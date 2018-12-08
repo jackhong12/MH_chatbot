@@ -12,7 +12,9 @@ def send_text_message(id, text):
     url = "{0}/me/messages?access_token={1}".format(GRAPH_URL, ACCESS_TOKEN)
     payload = {
         "recipient": {"id": id},
-        "message": {"text": "https://www.telegraph.co.uk/news/picturegalleries/picturesoftheday/12198377/Pictures-of-the-day-19th-March-2016.html"}
+        "message": {
+            "text": text
+        }
     }
     response = requests.post(url, json=payload)
 
@@ -29,7 +31,7 @@ def send_image_message(id, url_img):
             "attachment": {
                 "type": "image",
                 "payload":{
-                    "url": "https://bloximages.chicago2.vip.townnews.com/tribdem.com/content/tncms/assets/v3/editorial/3/83/38384be2-3ba5-11e8-adec-bf48bc62810f/5acadc92f3c7d.image.jpg"
+                    "url": url_img
                 }
             }
         }

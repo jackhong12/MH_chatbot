@@ -1,63 +1,45 @@
 from transitions.extensions import GraphMachine
-
+from monsterHunterCrawler import MHCrawler
 from utils import send_text_message, send_image_message, send_button_message, newButtonTest
 
 
 class TocMachine(GraphMachine):
+    mhc = MHCrawler()
+
     def __init__(self):
         #----------------------------------------------------------------------------------
         #dfa all state
         dfa = {
             'states': [
+                'allMission',
+                'searchMission',
+                'printMission',
                 'user',
-                'menu',
-                'order',
-                'hambuger',
-                'addEggAddCheese',
-                'noEggAddCheese',
-                'addEggNoCheese',
-                'noEggNoCheese',
-                'drink',
-                'ice',
-                'sugar',
-                'iceSugar',
-                'showBill',
-                'pay'
+                'help',
+                'command',
+                'allMonster',
+                'moster'
             ],
             'transitions': [
                 {
-                    'trigger': 'advance',
-                    'source': [
-                        'noEggNoCheese',
-                        'noEggAddCheese',
-                        'addEggAddCheese',
-                        'addEggNoCheese'
+                    'trigger': 'back',
+                    'source':[
+                        'help',
+                        'allMission',
+                        'printMission',
+                        'command'
                     ],
-                    'dest': 'hambuger',
-                    'conditions': 'isAnotherHambuger'
+                    'dest': 'user'
                 },
                 {
                     'trigger': 'advance',
-                    'source': [
-                        'noEggNoCheese',
-                        'noEggAddCheese',
-                        'addEggAddCheese',
-                        'addEggNoCheese'
+                    'source':[
+                        'allMonster',
+                        'searchMission'
                     ],
-                    'dest': 'drink',
-                    'conditions': 'isAnotherDrink'
-                },
-                {
-                    'trigger': 'advance',
-                    'source': [
-                        'noEggNoCheese',
-                        'noEggAddCheese',
-                        'addEggAddCheese',
-                        'addEggNoCheese'
-                    ],
-                    'dest': 'showBill',
-                    'conditions': 'isShowBill'
-                },
+                    'dest': 'user',
+                    'conditions': 'isBack'
+                }
             ],
             'initial': 'user',
             'auto_transitions': False,
@@ -68,43 +50,103 @@ class TocMachine(GraphMachine):
             model=self,
             **dfa
         )
-        self.machine.add_transition('back', 'order', 'user')
-        self.machine.add_transition('back', 'menu', 'user')
-        self.machine.add_transition('advance', 'user', 'menu', conditions = 'isMenu')
-        self.machine.add_transition('advance', 'user', 'order', conditions = 'isOrder')
-        self.machine.add_transition('advance', 'order', 'hambuger', conditions = 'isHambuger')
-        self.machine.add_transition('advance', 'order', 'drink', conditions = 'isDrink')
-        self.machine.add_transition('advance', 'hambuger', 'noEggNoCheese', conditions = 'isNoEggNoCheese')
-        self.machine.add_transition('advance', 'noEggNoCheese', 'addEggNoCheese', conditions = 'isAddEggNoCheese')
-        self.machine.add_transition('advance', 'noEggNoCheese', 'noEggAddCheese', conditions = 'isNoEggAddCheese')
-        self.machine.add_transition('advance', 'noEggNoCheese', 'addEggAddCheese', conditions = 'isAddEggAddCheese')
-        self.machine.add_transition('advance', 'noEggAddCheese', 'addEggAddCheese', conditions = 'isAddEgg')
-        self.machine.add_transition('advance', 'addEggNoCheese', 'addEggAddCheese', conditions = 'isAddCheese')
-        self.machine.add_transition('advance', 'drink', 'sugar', conditions = 'isSugar')
-        self.machine.add_transition('advance', 'drink', 'ice', conditions = 'isIce')
-        self.machine.add_transition('advance', 'drink', 'iceSugar', conditions = 'isIceSugar')
-        self.machine.add_transition('advance', 'ice', 'iceSugar', conditions = 'isSugar')
-        self.machine.add_transition('advance', 'sugar', 'iceSugar', conditions = 'isSugar')
-        self.machine.add_transition('advance', 'showBill', 'pay', conditions = 'isPay')
-
-    def isOrder(self, event):
+        #
+        self.machine.add_transition('advance', 'user', 'allMission', conditions = 'isAllMission')
+        self.machine.add_transition('advance', 'user', 'searchMission', conditions = 'isSearchMission')
+        #self.machine.add_transition('advance', 'searchMission', 'searchMission', conditions = 'isSearchMission')
+        self.machine.add_transition('advance', 'searchMission', 'printMission')
+        self.machine.add_transition('back2Search', 'printMission', 'searchMission')
+        self.machine.add_transition('advance', 'user', 'help', conditions = 'isHelp')
+        self.machine.add_transition('advance', 'user', 'command', conditions = 'isCommand')
+        self.machine.add_transition('advance', 'user', 'allMonster', conditions = 'isAllMonster')
+        self.machine.add_transition('advance', 'allMonster', 'monster')
+        #
+    def isAllMonster(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return text.lower() == 'order'
+            if text.lower() == '魔物':
+                return True
+            if text.lower() == 'monster':
+                return True
+            return False
+        return False
+
+    def on_enter_allMonster(self, event):
+        sender_id = event['sender']['id']
+        self.mhc.listAllMonster()
+        responese = send_text_message(sender_id, self.mhc.mbuffer);
+
+    def on_enter_monster(self, event):
+        pass
+
+    def isAllMission(self, event): 
+        if event.get("message"):
+            text = event['message']['text']
+            return text.lower() == '本周任務'
+        return False
+        
+
+    def on_enter_allMission(self, event):
+        sender_id = event['sender']['id']
+        self.mhc.listAllQuest()
+        responese = send_text_message(sender_id, self.mhc.mbuffer);
+        self.back()
+    
+    def isBack(self, event):
+        if event.get("message"):
+            text = event['message']['text']
+            return text.lower() == 'back'
+        return False
+
+    def isSearchMission(self, event):
+        if event.get("message"):
+            text = event['message']['text']
+            return text.lower() == '任務'
+        return False
+
+    def on_enter_searchMission(self, event):
+        sender_id = event['sender']['id']
+        responese = send_text_message(sender_id, '輸入任務');
+
+    def on_enter_printMission(self, event):
+        sender_id = event['sender']['id']
+        text = ''
+        if event.get('message'):
+            text = event['message']['text']
+        else:
+            responese = send_text_message(sender_id, '請輸入文字'); 
+            self.back2Search(event)
+            return
+
+        if(self.mhc.searchQuest(text)): 
+            responese = send_text_message(sender_id, self.mhc.mbuffer)
+            self.back()
+        else:
+            responese = send_text_message(sender_id, '請輸入正確任務名'); 
+            self.back2Search(event)
+
+
+    def isHelp(self, event):
+        if event.get("message"):
+            text = event['message']['text']
+            return text.lower() == 'help'
         return False
     
-    def on_enter_order(self, event):
+    def on_enter_help(self, event):
         sender_id = event['sender']['id']
-        responese = send_text_message(sender_id, "orde");
+        self.mhc.listAllQuest()
+        text = "*Monster Hunter Chatbot*\n你可以搜尋最近活動和魔物的功略，輸入command可以的知道所有指令"
+        responese = send_image_message(sender_id, 'https://img.gq.com.tw/_rs/645/userfiles/sm/sm1024_images_A1/35545/2018031643207121.jpg')
+        responese = send_text_message(sender_id, text);
         self.back()
 
-    def isMenu(self, event):
+    def isCommand(self, event):
         if event.get("message"):
             text = event['message']['text']
             return text.lower() == 'menu'
         return False
 
-    def on_enter_menu(self, event):
+    def on_enter_command(self, event):
         sender_id = event['sender']['id']
         #responese = send_button_message(sender_id, "menu");
         responese = newButtonTest(sender_id)
