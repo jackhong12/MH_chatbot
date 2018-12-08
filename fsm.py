@@ -18,7 +18,8 @@ class TocMachine(GraphMachine):
                 'help',
                 'command',
                 'allMonster',
-                'monster'
+                'monster',
+                'attackEffect',
             ],
             'transitions': [
                 {
@@ -60,10 +61,38 @@ class TocMachine(GraphMachine):
         self.machine.add_transition('advance', 'user', 'command', conditions = 'isCommand')
         self.machine.add_transition('advance', 'user', 'allMonster', conditions = 'isAllMonster')
         self.machine.add_transition('advance', 'allMonster', 'monster', conditions = 'isMonster')
+        self.machine.add_transition('advance', 'monster', 'monster', conditions = 'isMonster2')
         self.machine.add_transition('advance', 'monster', 'allMonster', conditions = 'isBack')
         self.machine.add_transition('back', 'monster', 'allMonster')
+        self.machine.add_transition('advance', 'monster', 'attackEffect', conditions = 'isAttackEffect')
+        self.machine.add_transition('back', 'attackEffect', 'monster')
         #
     
+    def isAttackEffect(self, event):
+        sender_id = event['sender']['id']
+        text = event['message']['text']
+        if text == "效果":
+            return True
+        else:
+            return False
+
+    def on_enter_attackEffect(self, event):
+        sender_id = event['sender']['id']
+        responese = send_text_message(sender_id, self.mhc.attackEffect());
+        self.back(event)
+
+    def isMonster2(self, event):
+        sender_id = event['sender']['id']
+        text = event['message']['text']
+        if self.mhc.searchMonster(text): 
+            print(self.mhc.monImg)
+            responese = send_image_message(sender_id, self.mhc.monImg)
+            responese = send_text_message(sender_id, self.mhc.monster.get(1))
+            #print(self.mhc.monster.get(1))
+            return True
+        else:
+            return False
+
     def isMonster(self, event):
         sender_id = event['sender']['id']
         text = event['message']['text']
@@ -163,11 +192,16 @@ class TocMachine(GraphMachine):
     def isCommand(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return text.lower() == 'menu'
+            return text.lower() == 'command'
         return False
 
     def on_enter_command(self, event):
+        """
+        self.mhc.listAllMonster()
+        self.mhc.searchMonster('滅盡龍')
+        self.mhc.dropItem()
+        responese = send_text_message(sender_id, self.mhc.drop.get(1))
+        """
         sender_id = event['sender']['id']
-        #responese = send_button_message(sender_id, "menu");
-        responese = newButtonTest(sender_id)
-        self.back();
+        responese = send_button_message(sender_id)
+        self.back()

@@ -20,6 +20,7 @@ class MHCrawler():
     mbuffer = ''
     monDict = {}
     monster = {}
+    drop = {}
     ###################################################################
     def __init__(self):
         pass
@@ -92,9 +93,25 @@ class MHCrawler():
         else: 
             return False
 
+    def attackEffect(self):
+        text = self.monster.get(2) + "◎＞○＞△＞×＞無効"
+        return text
+
+    def dropItem(self):
+        self.drop.clear()
+        i = 0
+        for drink in self.soup.select('{}'.format(".simple-table")):
+            i+=1
+            self.drop[i] = drink.get_text()
+            #print("\n\n---------------\n\n")
+            #print(drink.get_text())
+
+
 if __name__ == "__main__":
     mhc = MHCrawler()
     print("hello")
     mhc.listAllMonster()
     #print(mhc.mbuffer)
     mhc.searchMonster('雌火龍')
+    mhc.dropItem()
+    print(mhc.drop.get(2))

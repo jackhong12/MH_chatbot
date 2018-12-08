@@ -41,9 +41,8 @@ def send_image_message(id, url_img):
     if response.status_code != 200:
         print("Unable to send message: " + response.text)
 
-def send_button_message(id, url): 
+def send_button_message(id): 
     url = "{0}/me/messages?access_token={1}".format(GRAPH_URL, ACCESS_TOKEN) 
-    """
     payload = {
         "recipient": {"id": id},
         "message": {
@@ -51,27 +50,27 @@ def send_button_message(id, url):
                 "type": "template",
                 "payload":{
                     "template_type": "button",
-                    "text": "what",
+                    "text": "*command button*",
                     "buttons": [
                         {
                             "type": "postback",
-                            "title": "visit Messenger",
-                            "payload": "no"
+                            "title": "任務",
+                            "payload": "yes"
                         },
                         {
                             "type": "postback",
-                            "title": "visi Messenger",
-                            "payload": "no"
-                        }
+                            "title": "本周任務",
+                            "payload": "yes"
+                        },
+                        {
+                            "type": "postback",
+                            "title": "魔物",
+                            "payload": "yes"
+                        },
                     ]
                 }
             }
         }
-    }
-    """
-    payload = {
-        "recipient": {"id": id},
-        "message": {"text": "https://www.telegraph.co.uk/news/picturegalleries/picturesoftheday/12198377/Pictures-of-the-day-19th-March-2016.html"}
     }
     response = requests.post(url, json = payload)
 
@@ -81,7 +80,6 @@ def send_button_message(id, url):
     return response
 
 def newButtonTest(id):
-    print("00000000000000000000000000000000000000000000000000000000000000000000")
     url = "{0}/me/messages?access_token={1}".format(GRAPH_URL, ACCESS_TOKEN) 
     payload = {
         "recipient":{
