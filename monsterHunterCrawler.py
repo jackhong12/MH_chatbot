@@ -18,6 +18,7 @@ class MHCrawler():
         'wiki':'https://www.mhchinese.wiki/'
     };
     mbuffer = ''
+    murl = ''
     monDict = {}
     monster = {}
     drop = {}
@@ -49,15 +50,27 @@ class MHCrawler():
     def searchQuest(self, quest):
         self.setUrl('official')
         self.mbuffer = ''
+        i = 0
+        flag = False
         for drink in self.soup.select('{}'.format(self.officialWeb.get('quest'))):
+            i += 1
             if self.chFind(drink.get_text(), quest):
                 self.mbuffer = drink.get_text()
-                return True
-        return False
+                flag = True
+                break
+        j = 0
+        for drink2 in self.soup.select('{}'.format('.image')):
+            j += 2
+            if j == 2*i:
+                urls = drink2.findAll('img')
+                for url in urls:
+                    self.murl = url['src']
+                break
+        return flag
 
     def listAllMonster(self):
         self.setUrl('wiki')
-        self.mbuffer = '*魔物:*'
+        self.mbuffer = '*魔物:*\n'
         self.monDict.clear()
         for drink in self.soup.select('{}'.format(self.wikiWeb.get('tip'))):
             self.mbuffer += drink.get_text() + "\n"
@@ -105,13 +118,43 @@ class MHCrawler():
             self.drop[i] = drink.get_text()
             #print("\n\n---------------\n\n")
             #print(drink.get_text())
-
+        
+        #魔物弱點
+        strw = self.drop.get(1)
+        weakPoint = "*魔物弱點*\n"
+        weakPoint = weakPoint + "斬： " + strw[26] + "\n打： " + strw[28] + "\n彈： " + strw[30] + "\n火： " + strw[32] + "\n水： " + strw[34] + "\n雷： " + strw[36] + "\n冰: " + strw[38] + "\n龍： " + strw[40] + "\n◎＞○＞△＞×＞無効，斬/打/彈的弱點以左邊為最有效"
+        
+        #狀態異常效果
+        st = self.drop.get(3).replace('\n', '')
+        specialEffect = "*狀態異常效果*\n" + st[12] + ": " + st[13] + "\n"
+        for i in range(14, 29, 3):
+            specialEffect += st[i:i+2] + ": " + st[i+2] + "\n"
+        specialEffect += "\n◎＞○＞△＞×＞無効，斬/打/彈的弱點以左邊為最有效"
+        
+        #陷阱效果
+        st = self.drop.get(4).replace('\n', '')
+        trap = "*陷阱效果*\n" + st[14:18] + ": " + st[18] + "\n" + st[19:23] + ": " + st[23] + "\n"
+        for i in range(24, 36, 4):
+            trap += st[i:i+3] + ": " + st[i+3] + "\n" 
+        trap += "\n◎＞○＞△＞×＞無効，斬/打/彈的弱點以左邊為最有效"
+        
+        #魔物特徵
+        st = self.drop.get(5).replace('\n', '')
+        character = "*魔物特徵*\n" + "咆哮: " + st[20] + "\n" + "風壓: " + st[21] + "\n" + "震地: "+ st[22] + "\n" + "拘束: " + st[23] + "\n" + "属性狀態: " + st[24] + "\n" + "狀態異常: " + st[25]
+        print(character)
+        
+        st = self.drop.get(6).replace('\n', '')
+        print(st)
 
 if __name__ == "__main__":
     mhc = MHCrawler()
-    print("hello")
     mhc.listAllMonster()
     #print(mhc.mbuffer)
     mhc.searchMonster('雌火龍')
     mhc.dropItem()
-    print(mhc.drop.get(2))
+    #print(mhc.drop.get(2))
+    mhc.listAllQuest()
+    #print(mhc.mbuffer)
+    mhc.searchQuest('兩位女王')
+    #print(mhc.murl)
+    #print(mhc.drop.get(3).find("毒"))

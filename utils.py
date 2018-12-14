@@ -41,6 +41,24 @@ def send_image_message(id, url_img):
     if response.status_code != 200:
         print("Unable to send message: " + response.text)
 
+def send_video_message(id, url_video):
+    url = "{0}/me/messages?access_token={1}".format(GRAPH_URL, ACCESS_TOKEN)
+    payload = {
+        "recipient": {"id": id},
+        "message": {
+            "attachment": {
+                "type": "video",
+                "payload":{
+                    "url": url_video
+                }
+            }
+        }
+    }
+    response = requests.post(url, json=payload)
+
+    if response.status_code != 200:
+        print("Unable to send message: " + response.text)
+
 def send_button_message(id): 
     url = "{0}/me/messages?access_token={1}".format(GRAPH_URL, ACCESS_TOKEN) 
     payload = {

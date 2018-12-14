@@ -1,7 +1,6 @@
 from transitions.extensions import GraphMachine
 from monsterHunterCrawler import MHCrawler
-from utils import send_text_message, send_image_message, send_button_message, newButtonTest
-
+from utils import send_text_message, send_image_message, send_video_message, send_button_message
 
 class TocMachine(GraphMachine):
     mhc = MHCrawler()
@@ -20,6 +19,7 @@ class TocMachine(GraphMachine):
                 'allMonster',
                 'monster',
                 'attackEffect',
+                'video'
             ],
             'transitions': [
                 {
@@ -66,8 +66,23 @@ class TocMachine(GraphMachine):
         self.machine.add_transition('back', 'monster', 'allMonster')
         self.machine.add_transition('advance', 'monster', 'attackEffect', conditions = 'isAttackEffect')
         self.machine.add_transition('back', 'attackEffect', 'monster')
+        self.machine.add_transition('advance', 'user', 'video', conditions = 'isVideo')
+        self.machine.add_transition('back', 'video', 'user')
         #
-    
+   
+    def isVideo(self, event):
+        sender_id = event['sender']['id']
+        text = event['message']['text']
+        if text == "video":
+            return True
+        else:
+            return False
+
+    def on_enter_video(self, event):
+        sender_id = event['sender']['id']
+        responese = send_video_message(sender_id, "http://clips.vorwaerts-gmbh.de/VfE_html5.mp4");
+        self.back(event)
+
     def isAttackEffect(self, event):
         sender_id = event['sender']['id']
         text = event['message']['text']
@@ -167,7 +182,8 @@ class TocMachine(GraphMachine):
             self.back2Search(event)
             return
 
-        if(self.mhc.searchQuest(text)): 
+        if(self.mhc.searchQuest(text)):
+            responese = send_image_message(sender_id, self.mhc.murl)
             responese = send_text_message(sender_id, self.mhc.mbuffer)
             self.back()
         else:
