@@ -19,12 +19,17 @@ class TocMachine(GraphMachine):
                 'allMonster',
                 'monster',
                 'attackEffect',
-                'video'
+                'video',
+                'trap',
+                'effect',
+                'character'
+                
             ],
             'transitions': [
                 {
                     'trigger': 'back',
                     'source':[
+                        'video',
                         'help',
                         'allMission',
                         'printMission',
@@ -40,6 +45,16 @@ class TocMachine(GraphMachine):
                     ],
                     'dest': 'user',
                     'conditions': 'isBack'
+                },
+                {
+                    'trigger': 'back',
+                    'source':[
+                        'attackEffect',
+                        'trap',
+                        'effect',
+                        'character'
+                    ],
+                    'dest': 'monster',
                 }
             ],
             'initial': 'user',
@@ -65,11 +80,54 @@ class TocMachine(GraphMachine):
         self.machine.add_transition('advance', 'monster', 'allMonster', conditions = 'isBack')
         self.machine.add_transition('back', 'monster', 'allMonster')
         self.machine.add_transition('advance', 'monster', 'attackEffect', conditions = 'isAttackEffect')
-        self.machine.add_transition('back', 'attackEffect', 'monster')
         self.machine.add_transition('advance', 'user', 'video', conditions = 'isVideo')
-        self.machine.add_transition('back', 'video', 'user')
+        self.machine.add_transition('advance', 'monster', 'effect', conditions = 'isEffect')
+        self.machine.add_transition('advance', 'monster', 'trap', conditions = 'isTrap')
+        self.machine.add_transition('advance', 'monster', 'character', conditions = 'isCharacter')
         #
-   
+     
+    def on_enter_character(self, event):
+        sender_id = event['sender']['id']
+        self.mhc.dropItem()
+        responese = send_text_message(sender_id, self.mhc.monEff['character']);
+        self.back(event)
+
+    def isCharacter(self, event):
+        sender_id = event['sender']['id']
+        text = event['message']['text']
+        if text == "特徵":
+            return True
+        else:
+            return False
+
+    def on_enter_trap(self, event):
+        sender_id = event['sender']['id']
+        self.mhc.dropItem()
+        responese = send_text_message(sender_id, self.mhc.monEff['trap']);
+        self.back(event)
+        
+    def isTrap(self, event):
+        sender_id = event['sender']['id']
+        text = event['message']['text']
+        if text == "陷阱":
+            return True
+        else:
+            return False
+
+    def on_enter_effect(self, event):
+        sender_id = event['sender']['id']
+        self.mhc.dropItem()
+        responese = send_text_message(sender_id, self.mhc.monEff['seffect']);
+        self.back(event)
+        
+    def isEffect(self, event):
+        sender_id = event['sender']['id']
+        text = event['message']['text']
+        if text == "效果":
+            return True
+        else:
+            return False
+
     def isVideo(self, event):
         sender_id = event['sender']['id']
         text = event['message']['text']
@@ -86,14 +144,15 @@ class TocMachine(GraphMachine):
     def isAttackEffect(self, event):
         sender_id = event['sender']['id']
         text = event['message']['text']
-        if text == "效果":
+        if text == "弱點":
             return True
         else:
             return False
 
     def on_enter_attackEffect(self, event):
         sender_id = event['sender']['id']
-        responese = send_text_message(sender_id, self.mhc.attackEffect());
+        self.mhc.dropItem()
+        responese = send_text_message(sender_id, self.mhc.monEff['weak']);
         self.back(event)
 
     def isMonster2(self, event):

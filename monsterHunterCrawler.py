@@ -22,6 +22,7 @@ class MHCrawler():
     monDict = {}
     monster = {}
     drop = {}
+    monEff = {}
     ###################################################################
     def __init__(self):
         pass
@@ -112,6 +113,7 @@ class MHCrawler():
 
     def dropItem(self):
         self.drop.clear()
+        self.monEff.clear()
         i = 0
         for drink in self.soup.select('{}'.format(".simple-table")):
             i+=1
@@ -122,26 +124,30 @@ class MHCrawler():
         #魔物弱點
         strw = self.drop.get(1)
         weakPoint = "*魔物弱點*\n"
-        weakPoint = weakPoint + "斬： " + strw[26] + "\n打： " + strw[28] + "\n彈： " + strw[30] + "\n火： " + strw[32] + "\n水： " + strw[34] + "\n雷： " + strw[36] + "\n冰: " + strw[38] + "\n龍： " + strw[40] + "\n◎＞○＞△＞×＞無効，斬/打/彈的弱點以左邊為最有效"
-        
+        weakPoint = weakPoint + "斬： " + strw[26] + "\n打： " + strw[28] + "\n彈： " + strw[30] + "\n火： " + strw[32] + "\n水： " + strw[34] + "\n雷： " + strw[36] + "\n冰: " + strw[38] + "\n龍： " + strw[40] + "\n\n◎＞○＞△＞×＞無効，斬/打/彈的弱點以左邊為最有效"
+        self.monEff['weak'] = weakPoint
+
         #狀態異常效果
         st = self.drop.get(3).replace('\n', '')
         specialEffect = "*狀態異常效果*\n" + st[12] + ": " + st[13] + "\n"
         for i in range(14, 29, 3):
             specialEffect += st[i:i+2] + ": " + st[i+2] + "\n"
         specialEffect += "\n◎＞○＞△＞×＞無効，斬/打/彈的弱點以左邊為最有效"
-        
+        self.monEff['seffect'] = specialEffect
+
         #陷阱效果
         st = self.drop.get(4).replace('\n', '')
         trap = "*陷阱效果*\n" + st[14:18] + ": " + st[18] + "\n" + st[19:23] + ": " + st[23] + "\n"
         for i in range(24, 36, 4):
             trap += st[i:i+3] + ": " + st[i+3] + "\n" 
         trap += "\n◎＞○＞△＞×＞無効，斬/打/彈的弱點以左邊為最有效"
-        
+        self.monEff['trap'] = trap
+
         #魔物特徵
         st = self.drop.get(5).replace('\n', '')
         character = "*魔物特徵*\n" + "咆哮: " + st[20] + "\n" + "風壓: " + st[21] + "\n" + "震地: "+ st[22] + "\n" + "拘束: " + st[23] + "\n" + "属性狀態: " + st[24] + "\n" + "狀態異常: " + st[25]
-        print(character)
+        self.monEff['character'] = character
+        #print(character)
         
         st = self.drop.get(6).replace('\n', '')
         print(st)
