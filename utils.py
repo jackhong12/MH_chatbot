@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-from setToken import setToken
+#from setToken import setToken
 
 setToken()
 GRAPH_URL = "https://graph.facebook.com/v3.2"
@@ -47,9 +47,14 @@ def send_video_message(id, url_video):
         "recipient": {"id": id},
         "message": {
             "attachment": {
-                "type": "video",
+                "type": "template",
                 "payload":{
-                    "url": url_video
+                    "template_type": "open_graph",
+                    "elements":[
+                        {
+                            "url": url_video
+                        }
+                    ]
                 }
             }
         }

@@ -138,7 +138,7 @@ class TocMachine(GraphMachine):
 
     def on_enter_video(self, event):
         sender_id = event['sender']['id']
-        responese = send_video_message(sender_id, "http://clips.vorwaerts-gmbh.de/VfE_html5.mp4");
+        responese = send_video_message(sender_id, "https://www.youtube.com/watch?v=pp_wSIhdd2s");
         self.back(event)
 
     def isAttackEffect(self, event):
