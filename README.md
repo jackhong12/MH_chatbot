@@ -6,7 +6,7 @@ Monster Hunter Guides Chatbot
 * File: MHGC 魔物獵人攻略bot
 * Author: 黃振宏
 * Last updated: 2018/12/18
-* Describe:
+* Describe:  
     這是魔物獵人世界的攻略查尋器，藉由Chatbot的形式，     你可向Chatbot問最近的活動或者是魔物的資訊
 -------------------------------------------
 
@@ -23,13 +23,13 @@ Monster Hunter Guides Chatbot
 2. fsm.py  
     `finite state machine`  
     
-3. utils.py 
+3. utils.py   
     `定義回傳facebook的function`  
     
-4. monsterHonterCrawler.py
-    `利用 BeautifulSoup module 爬魔物獵人的官網和wiki攻略`
-    `官網: http://game.capcom.com/world/steam/hk/schedule.html`
-    `wiki: https://www.mhchinese.wiki/`
+4. monsterHonterCrawler.py   
+    `利用 BeautifulSoup module 爬魔物獵人的官網和wiki攻略`   
+    `官網: http://game.capcom.com/world/steam/hk/schedule.html`  
+    `wiki: https://www.mhchinese.wiki/`  
     
 <br>
 
