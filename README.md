@@ -20,10 +20,8 @@ Monster Hunter Guides Chatbot
 3. 執行  `$./pyphon3 app.py`  
 
 
-
-   #### heroku  
-
-   url: https://git.heroku.com/monsterchatbot.git
+#### heroku  
+url: https://git.heroku.com/monsterchatbot.git
 
 <br>
 
