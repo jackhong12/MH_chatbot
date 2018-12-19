@@ -3,9 +3,10 @@ import json
 import os
 #from setToken import setToken
 
-setToken()
+#setToken()
 GRAPH_URL = "https://graph.facebook.com/v3.2"
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+#ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
 
 
 def send_text_message(id, text):
